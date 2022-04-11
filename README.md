@@ -4,5 +4,5 @@
  - [linux][1]
  - [mac][2]
 
-[1]: https://github.com/molecula/sandbox/linux/ "Title"
-[2]: https://github.com/molecula/sandbox/mac/ "Title"
+[1]: https://github.com/molecula/sandbox/tree/main/linux "Title"
+[2]: https://github.com/molecula/sandbox/tree/main/mac "Title"
