@@ -11,7 +11,7 @@ DATA_URL="https://data.molecula.cloud/v1"
 #
 # Dataset ...
 #
-S3_URL="https://se-public-datasets.s3.us-east-2.amazonaws.com/cseg_skills_backup.tar.gz"
+S3_URL="https://se-public-datasets.s3.us-east-2.amazonaws.com/cseg0_backup.tar.gz";
 
 #
 # Table(s) and validation counts... set -A TABLE_NAMES "[table_name1]" "[table_name2]" etc.
