@@ -85,7 +85,7 @@ function deployment_delete {
       #echo "Error with Deleting Deployment, Exiting ..."
       #exit 1
    fi
-   echo "Please verify that the deployment ${DEPLOYMENT_NAME} deleted ..."
+   echo "Please verify that the deployment ${DEPLOYMENT_NAME} deleted and no other deployments exist..."
 }  
 
 #
@@ -121,12 +121,6 @@ if [[ "${TOKEN}" == "" ]];then
    exit 1
 fi
 
-# 
-# Get Org Id ...
-#
-#TEXT=`curl -s --location --request GET "${API_URL}/users" --header "Authorization: ${TOKEN}" --header 'Content-Type: text/plain'`
-#ORG_ID=`echo "${TEXT}" | grep -Eo '"org_id":.*?[^\\]",' | sed -e 's/[\"\,\: ]*//g' | sed -e 's/org_id//'`
-#echo "ORG_ID: ${ORG_ID}"
 
 #
 # Create Deployment ...
@@ -143,7 +137,6 @@ DEPLOYMENT_ID=`echo "${STATUS}" | grep -Eo '"id":.*?[^\\]",' | sed -e 's/[\"\,\:
 if [[ "${DEPLOYMENT_ID}" == "" ]]; then
    echo "Create Deployment API Result:${STATUS}"
    echo "Error with Creating Deployment, exiting. Please retry running script or contact us."
-   #deployment_delete "${API_URL}" "${DEPLOYMENT_ID}" "${DEPLOYMENT_NAME}"
    exit 1
 fi
 echo "Creating your FeatureBase Deployment, this will take about one minute, please wait ..."
@@ -165,7 +158,7 @@ if [[ "${STATE}" != "RUNNING" ]];then
    exit 1
 fi
 echo "Deployment ${DEPLOYMENT_NAME} successfully created and ${STATE}, proceeding with loading data into your deployment"
-echo "This dataset has 1B records and takes about 22-24 minutes to restore, please wait ..."
+echo "This dataset has 1B records and takes about 25 minutes to restore, please wait ..."
 
 #
 # Restore Dataset from S3 bucket ...
@@ -226,6 +219,7 @@ do
 
    if [[ "${CNT}" != ${TABLE_CNTS[$TABLE_NUM]} ]];then
       echo "${TABLE_NAMES[$TABLE_NUM]} records were not loaded succesfully, exiting. Please retry running script or contact us."
+      deployment_delete "${API_URL}" "${DEPLOYMENT_ID}" "${DEPLOYMENT_NAME}" 
       exit 1
    fi
 
@@ -240,6 +234,7 @@ do
 
    if [[ "${CNT}" != ${TABLE_CNTS[$TABLE_NUM]} ]];then
       echo "${TABLE_CNTS[$TABLE_NUM]} records were not loaded succesfully, exiting. Please retry running script or contact us."
+      deployment_delete "${API_URL}" "${DEPLOYMENT_ID}" "${DEPLOYMENT_NAME}" 
       exit 1
    fi
 
