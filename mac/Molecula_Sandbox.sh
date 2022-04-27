@@ -120,6 +120,7 @@ if [[ "${TOKEN}" == "" ]];then
    echo "Login Error, Exiting ..."
    exit 1
 fi
+PASSWD=""
 
 # 
 # Get Org Id ...
