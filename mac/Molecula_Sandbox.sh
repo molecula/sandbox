@@ -17,7 +17,7 @@ S3_URL="https://se-public-datasets.s3.us-east-2.amazonaws.com/cseg0_backup.tar.g
 # Table(s) and validation counts... set -A TABLE_NAMES "[table_name1]" "[table_name2]" etc.
 #
 set -A TABLE_NAMES "cseg" "skills" 
-set -A TABLE_CNTS "1000000001" "25000"
+set -A TABLE_CNTS "1000000000" "25000"
 
 ##########################################
 ## Typically, no changes required below ##
