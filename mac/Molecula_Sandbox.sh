@@ -158,7 +158,7 @@ if [[ "${STATE}" != "RUNNING" ]];then
    exit 1
 fi
 echo "Deployment ${DEPLOYMENT_NAME} successfully created and ${STATE}, proceeding with loading data into your deployment"
-echo "This dataset has 1B records and takes about 25 minutes to restore, please wait ..."
+echo "This dataset has 1B records and takes about 30 minutes to restore, please wait ..."
 
 #
 # Restore Dataset from S3 bucket ...
