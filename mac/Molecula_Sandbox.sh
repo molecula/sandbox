@@ -100,7 +100,7 @@ fi
 #
 # Get Username and Password ...
 # 
-echo "Welcome to Molecula Featurebase SaaS Trial!"
+echo "Welcome to Molecula Featurebase Sandbox!"
 echo -n "Username: "; read USRNAME
 stty -echo 
 echo "Note: You will not see any characters or cursor movement when entering/pasting Password ..."
