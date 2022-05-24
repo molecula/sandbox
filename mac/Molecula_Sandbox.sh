@@ -3,7 +3,7 @@
 #
 # Variables ...
 #
-SHAPE="64GB"     # "8GB" "64GB" etc. 
+SHAPE="Sandbox"     # "8GB" "64GB" etc. 
 DEPLOYMENT_NAME="sandbox_deployment"
 API_URL="https://api.molecula.cloud/v1"
 DATA_URL="https://data.molecula.cloud/v1"
