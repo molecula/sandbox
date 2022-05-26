@@ -35,7 +35,7 @@ function deployment_delete {
    # Get Deployment Id ...
    #
    if [[ "${DEPLOYMNET_ID}" == "" ]];then
-      STATUS=`curl -s --location --request GET "${API_URL}/deployments" --header "Authorization: ${TOKEN}" --header "Content-Type: text/plain"`
+      STATUS=`curl -s --location --request GET "${API_URL}/deployments" --header "Authorization: Bearer ${TOKEN}" --header "Content-Type: text/plain"`
       #echo "${STATUS}"
       DEPLOYMENT_ID=`echo "${STATUS}" | jq -r ".resources[] | select(.name==\"${DEPLOYMENT_NAME}\") | .id"`
       echo "DEPLOYMENT_ID: ${DEPLOYMENT_ID}"
@@ -48,14 +48,14 @@ function deployment_delete {
    #
    # Delete all tables in Deployment ... 
    #
-   STATUS=`curl -s --location --request GET "${API_URL}/tables/${DEPLOYMENT_ID}"  --header "Authorization: ${TOKEN}" --header "Content-Type: text/plain" | jq ".resources[]"`
+   STATUS=`curl -s --location --request GET "${API_URL}/tables/${DEPLOYMENT_ID}"  --header "Authorization: Bearer ${TOKEN}" --header "Content-Type: text/plain" | jq ".resources[]"`
    #echo "${STATUS}"
    while IFS= read -r p; do
       #echo $p
       TBL=`echo "${p}" | jq -r ".name"`
       if [[ "${TBL}" != "" ]] && [[ "${TBL}" != "null" ]]; then
          echo "Deleting TableName: ${DEPLOYMENT_ID}/${TBL}"
-         DELSTATUS=`curl -s --location --request DELETE "${API_URL}/tables/${DEPLOYMENT_ID}/${TBL}"  --header "Authorization: ${TOKEN}" --header "Content-Type: text/plain" | jq "."`
+         DELSTATUS=`curl -s --location --request DELETE "${API_URL}/tables/${DEPLOYMENT_ID}/${TBL}"  --header "Authorization: Bearer ${TOKEN}" --header "Content-Type: text/plain" | jq "."`
          echo "${DELSTATUS}"
          sleep 10
       fi
@@ -66,7 +66,7 @@ function deployment_delete {
    #
    echo "Deleting Deployment ${DEPLOYMENT_NAME} id ${DEPLOYMENT_ID} ..."
    STATUS=`curl -s --location --request DELETE "${API_URL}/deployments/${DEPLOYMENT_ID}" \
-    --header "Authorization: ${TOKEN}" \
+    --header "Authorization: Bearer ${TOKEN}" \
     --header "Content-Type: application/json" | jq "."`
    echo "${STATUS}"
 
@@ -75,7 +75,7 @@ function deployment_delete {
    #
    STATE="DELETING"
    while [[ "${STATE}" == "DELETING" ]];do
-      STATUS=`curl -s --location --request GET "${API_URL}/deployments/${DEPLOYMENT_ID}" --header "Authorization: ${TOKEN}" --header "Content-Type: text/plain" | jq "."`
+      STATUS=`curl -s --location --request GET "${API_URL}/deployments/${DEPLOYMENT_ID}" --header "Authorization: Bearer ${TOKEN}" --header "Content-Type: text/plain" | jq "."`
       STATE=`echo "${STATUS}" | jq -r ".deployment_status"`
       echo "${STATE}"
       sleep 10
@@ -127,7 +127,7 @@ PASSWD=""
 # Create Deployment ...
 #
 STATUS=`curl -s --location --request POST "${API_URL}/deployments" \
- --header "Authorization: ${TOKEN}" \
+ --header "Authorization: Bearer ${TOKEN}" \
  --header "Content-Type: application/json" \
  --data-raw "{
      \"name\": \"${DEPLOYMENT_NAME}\",
@@ -147,7 +147,7 @@ echo "Creating your FeatureBase Deployment, this will take about one minute, ple
 #
 STATE="CREATING"
 while [[ "${STATE}" == "CREATING" ]];do
-   STATUS=`curl -s --location --request GET "${API_URL}/deployments/${DEPLOYMENT_ID}" --header "Authorization: ${TOKEN}" --header "Content-Type: text/plain"`
+   STATUS=`curl -s --location --request GET "${API_URL}/deployments/${DEPLOYMENT_ID}" --header "Authorization: Bearer ${TOKEN}" --header "Content-Type: text/plain"`
    STATE=`echo "${STATUS}" | grep -Eo '"deployment_status":.*?[^\\]",' | sed -e 's/[\"\,\: ]*//g' | sed -e 's/deployment_status//'`
    echo "${STATE}"
    sleep 10
@@ -165,7 +165,7 @@ echo "This dataset has 1B records and takes about 30 minutes to restore, please 
 # Restore Dataset from S3 bucket ...
 #
 STATUS=`curl -s --location --request PUT "${API_URL}/deployments/${DEPLOYMENT_ID}/action/restore" \
- --header "Authorization: ${TOKEN}" \
+ --header "Authorization: Bearer ${TOKEN}" \
  --header "Content-Type: application/json" \
  --data-raw "{
    \"source_type\": \"http\",
@@ -178,7 +178,7 @@ echo "Restore API: ${STATUS}"
 #
 STATE="IN_PROGRESS"
 while [[ "${STATE}" == "IN_PROGRESS" ]];do
-   STATUS=`curl -s --location --request GET "${API_URL}/deployments/${DEPLOYMENT_ID}/action/restore" --header "Authorization: ${TOKEN}" --header "Content-Type: application/json"`
+   STATUS=`curl -s --location --request GET "${API_URL}/deployments/${DEPLOYMENT_ID}/action/restore" --header "Authorization: Bearer ${TOKEN}" --header "Content-Type: application/json"`
    STATE=`echo "${STATUS}" | grep -Eo '"status":.*?[^\\]",' | sed -e 's/[\"\,\: ]*//g' | sed -e 's/status//'`
    echo "${STATE}"
    sleep 10
@@ -196,7 +196,7 @@ echo "Restore successful and ${STATE}, proceeding with Table(s) creation"
 #
 for x in ${TABLE_NAMES[@]};do
    STATUS=`curl -s --location --request POST "${API_URL}/tables/${DEPLOYMENT_ID}/" \
- --header "Authorization: ${TOKEN}" --header "Content-Type: text/plain" \
+ --header "Authorization: Bearer ${TOKEN}" --header "Content-Type: text/plain" \
  --data-raw "{\"name\": \"${x}\", \"description\": \"Table containing fabricated customer data to highlight low latency segmentation\"}"`
    echo "Create Table ${x} API: ${STATUS}"
 done
@@ -212,7 +212,7 @@ do
    PQL="[${TABLE_NAMES[$TABLE_NUM]}]Count(All())"
    echo "PQL> ${PQL}"
    STATUS=`curl -s --location --request POST "${DATA_URL}/deployments/${DEPLOYMENT_ID}/query" \
-   --header "Authorization: ${TOKEN}" \
+   --header "Authorization: Bearer ${TOKEN}" \
    --header "Content-Type: application/vnd.molecula.pql" \
    --data-raw "{ \"language\": \"pql\", \"statement\": \"${PQL}\"}"`
    CNT=`echo "${STATUS}" | grep -Eo '"Uint64Val":(\d*?,|.*?[^\\]})' | sed -e "s/\"Uint64Val\"://" | sed -e "s/}//"`
@@ -227,7 +227,7 @@ do
    SQL="select count(*) from ${TABLE_NAMES[$TABLE_NUM]}"
    echo "SQL> ${SQL}"
    STATUS=`curl -s --location --request POST "${DATA_URL}/deployments/${DEPLOYMENT_ID}/query" \
-   --header "Authorization: ${TOKEN}" \
+   --header "Authorization: Bearer ${TOKEN}" \
    --header "Content-Type: application/vnd.molecula.sql" \
    --data-raw "{ \"language\": \"sql\", \"statement\": \"${SQL}\"}"`
    CNT=`echo "${STATUS}" | grep -Eo '"Uint64Val":(\d*?,|.*?[^\\]})' | sed -e "s/\"Uint64Val\"://" | sed -e "s/}//"`
